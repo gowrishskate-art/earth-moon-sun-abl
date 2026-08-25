@@ -45,11 +45,11 @@ button{touch-action:manipulation}
   flex-direction:column;min-height:0}
 .slide.active{display:flex}
 .rv{opacity:0;transform:translateY(22px)}
-.active .rv{animation:rise .8s cubic-bezier(.2,.8,.2,1) forwards}
+.active .rv{opacity:1;transform:none;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
 .active .d1{animation-delay:.06s}.active .d2{animation-delay:.18s}
 .active .d3{animation-delay:.3s}.active .d4{animation-delay:.42s}
 .active .d5{animation-delay:.54s}.active .d6{animation-delay:.66s}
-@keyframes rise{to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 .kicker{display:flex;align-items:center;gap:12px;font-size:clamp(10px,1.3vh,12px);
   letter-spacing:.32em;text-transform:uppercase;color:var(--amber);font-weight:500}
 .kicker .no{font-family:'Bricolage Grotesque';color:var(--cream-dim);
@@ -121,10 +121,8 @@ h2.slide-title em{font-style:normal;color:var(--amber)}
 .qwrap{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,36px);flex:1;min-height:0;align-content:center}
 .q{border:1px solid var(--line);border-radius:clamp(14px,2vh,22px);
   padding:clamp(12px,2.4vh,28px) clamp(14px,2.4vw,30px);background:rgba(13,18,32,.55);
-  display:flex;flex-direction:column;min-height:0}
-.q.flash{animation:qflash .55s ease}
-@keyframes qflash{0%,100%{box-shadow:0 0 0 0 rgba(255,179,71,0)}
-  40%{box-shadow:0 0 0 3px rgba(255,179,71,.6)}}
+  display:flex;flex-direction:column;min-height:0;transition:box-shadow .4s ease}
+.q.flash{box-shadow:0 0 0 3px rgba(255,179,71,.55)}
 .q .qnum{font-family:'Bricolage Grotesque';font-weight:700;color:var(--teal);
   font-size:clamp(9px,1.3vh,13px);letter-spacing:.2em;margin-bottom:clamp(5px,1vh,10px)}
 .q p{font-size:clamp(14px,1.8vh + .5vw,19px);line-height:1.4;margin-bottom:clamp(8px,1.8vh,18px)}
@@ -789,6 +787,7 @@ qEls.forEach((q,qi)=>{
     }
     opts.forEach(x=>x.disabled=true);
     q.classList.add('flash');
+    setTimeout(()=>q.classList.remove('flash'),700);
     updateChips();
   }));
 });
@@ -825,6 +824,7 @@ slides.forEach((s,k)=>{
 });
 document.addEventListener('keydown',e=>{
   const k=e.key;
+  if((k===' '||k==='Enter')&&e.target.closest&&e.target.closest('button'))return; // focused option = answer, not advance
   if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'||k==='n'||k==='N'){e.preventDefault();show(i+1);}
   else if(k==='ArrowLeft'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){e.preventDefault();show(i-1);}
   else if(k==='Home'){e.preventDefault();show(0);}
@@ -836,6 +836,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('click',e=>{
   if(e.target.closest('button')||e.target.closest('a'))return;
+  if(slides[i].querySelector('[data-q]'))return; // quiz slides: answering only, no click-advance
   show(i+1);
 });
 let touchX=null;
