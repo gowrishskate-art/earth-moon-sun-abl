@@ -180,11 +180,18 @@ h2.slide-title em{font-style:normal;color:var(--amber)}
   background:transparent;cursor:pointer;padding:0;transition:all .25s ease}
 .dot-nav:hover{border-color:var(--amber);transform:scale(1.35)}
 .dot-nav.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 10px rgba(255,179,71,.8)}
+@media (max-width:1000px){
+  .qwrap{grid-template-columns:1fr;align-content:start}
+  .q{padding:clamp(10px,1.8vh,20px) clamp(12px,2vw,24px)}
+  .opts{gap:clamp(5px,1vh,9px)}
+  .opt{padding:clamp(6px,1.1vh,10px) clamp(9px,1.4vw,14px);line-height:1.25}
+  .opt .key{width:22px;height:22px}
+  .qwrap{overflow-y:auto;scrollbar-width:thin}
+  .slide{overflow-y:auto}
+}
 @media (max-width:900px){
-  .slide{overflow-y:auto;scrollbar-width:thin}
   .body-grid{grid-template-columns:1fr}
   .fig .frame{flex:0 0 auto;min-height:240px}
-  .qwrap{grid-template-columns:1fr}
   .hint{display:none}
   .rail{gap:5px}.dot-nav{width:6px;height:6px}
   .quiz-head{flex-wrap:wrap;gap:8px}
