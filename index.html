@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080B14">
+<title>Earth, Moon and the Sun — ABL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#080B14;--ink2:#0D1220;--line:rgba(244,238,224,.14);
+  --cream:#F4EEE0;--cream-dim:rgba(244,238,224,.62);
+  --amber:#FFB347;--amber2:#FF7A2F;--moon:#E8E4D8;--teal:#5FD4C4;
+  --wrong:#FF5C6C;--right:#4ADE80;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--ink);color:var(--cream);font-family:'Space Grotesk',sans-serif;overflow:hidden;cursor:default;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+.sky .stars{position:absolute;inset:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(244,238,224,.8) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 68%, rgba(244,238,224,.5) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 58% 12%, rgba(95,212,196,.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 44%, rgba(244,238,224,.6) 50%, transparent 51%),
+    radial-gradient(2px 2px at 86% 78%, rgba(255,179,71,.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 22% 86%, rgba(244,238,224,.45) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 91% 18%, rgba(244,238,224,.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 45% 38%, rgba(244,238,224,.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 66% 88%, rgba(95,212,196,.5) 50%, transparent 51%);
+  animation:twinkle 6s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.55}to{opacity:1}}
+.sky .glow{position:absolute;width:60vw;height:60vw;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,122,47,.13), transparent 60%);top:-25vw;right:-15vw;filter:blur(10px)}
+.sky .glow2{position:absolute;width:45vw;height:45vw;border-radius:50%;
+  background:radial-gradient(circle, rgba(95,212,196,.08), transparent 60%);bottom:-20vw;left:-12vw}
+.grain{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E")}
+.deck{position:relative;z-index:1;height:100vh}
+.slide{position:absolute;inset:0;display:none;
+  padding:clamp(18px,3.2vh,40px) clamp(22px,5vw,64px) clamp(84px,12vh,108px);
+  flex-direction:column;min-height:0}
+.slide.active{display:flex}
+.rv{opacity:0;transform:translateY(22px)}
+.active .rv{animation:rise .8s cubic-bezier(.2,.8,.2,1) forwards}
+.active .d1{animation-delay:.06s}.active .d2{animation-delay:.18s}
+.active .d3{animation-delay:.3s}.active .d4{animation-delay:.42s}
+.active .d5{animation-delay:.54s}.active .d6{animation-delay:.66s}
+@keyframes rise{to{opacity:1;transform:none}}
+.kicker{display:flex;align-items:center;gap:12px;font-size:clamp(10px,1.3vh,12px);
+  letter-spacing:.32em;text-transform:uppercase;color:var(--amber);font-weight:500}
+.kicker .no{font-family:'Bricolage Grotesque';color:var(--cream-dim);
+  border:1px solid var(--line);border-radius:999px;padding:3px 11px;letter-spacing:.15em}
+.kicker .bar{flex:0 0 38px;height:1px;background:var(--amber)}
+h2.slide-title{font-family:'Bricolage Grotesque';font-weight:800;
+  font-size:clamp(24px,3.4vh + .9vw,48px);line-height:1.04;margin:clamp(8px,1.4vh,16px) 0 4px;letter-spacing:-.01em}
+h2.slide-title em{font-style:normal;color:var(--amber)}
+.body-grid{display:grid;grid-template-columns:1.05fr .95fr;
+  gap:clamp(20px,3.5vw,52px);flex:1;min-height:0;margin-top:4px;align-items:stretch}
+.points{list-style:none;display:flex;flex-direction:column;
+  gap:clamp(8px,1.5vh,15px);margin-top:clamp(10px,1.8vh,20px);min-height:0}
+.points li{display:flex;gap:13px;align-items:flex-start;
+  font-size:clamp(13px,1.5vh + .5vw,16.5px);line-height:1.5;color:var(--cream)}
+.points li b{color:var(--amber);font-weight:700}
+.points .dot{flex:0 0 auto;width:9px;height:9px;border-radius:2px;background:var(--amber);
+  margin-top:.55em;transform:rotate(45deg)}
+.funfact{margin-top:clamp(10px,2vh,22px);display:inline-flex;gap:11px;align-items:center;
+  border:1px dashed rgba(95,212,196,.55);border-radius:13px;padding:clamp(8px,1.4vh,13px) clamp(11px,1.6vw,17px);
+  font-size:clamp(11.5px,1.3vh + .3vw,14px);color:var(--teal);max-width:540px;line-height:1.45}
+.funfact .tag{font-family:'Bricolage Grotesque';font-weight:700;background:var(--teal);
+  color:var(--ink);padding:4px 9px;border-radius:8px;font-size:.8em;letter-spacing:.06em;flex:0 0 auto}
+.fig{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(6px,1.2vh,14px);min-height:0}
+.fig .frame{flex:1 1 auto;min-height:0;width:100%;max-width:min(460px,100%);
+  border:1px solid var(--line);border-radius:clamp(14px,2.2vh,24px);
+  background:linear-gradient(160deg,var(--ink2),#0A0F1C);
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(10px,1.8vh,26px);position:relative;overflow:hidden}
+.fig .frame::after{content:"";position:absolute;inset:9px;border:1px solid rgba(244,238,224,.06);
+  border-radius:12px;pointer-events:none}
+.fig svg{width:100%;height:100%;display:block}
+.fig figcaption{font-size:clamp(9px,1.2vh,11.5px);letter-spacing:.22em;text-transform:uppercase;color:var(--cream-dim)}
+.title-slide{justify-content:center;align-items:center;text-align:center}
+.title-slide .over{font-size:clamp(10px,1.5vh,13px);letter-spacing:.5em;text-transform:uppercase;color:var(--teal);margin-bottom:clamp(14px,2.5vh,26px)}
+.title-slide h1{font-family:'Bricolage Grotesque';font-weight:800;
+  font-size:clamp(38px,min(8vw,12.5vh),104px);line-height:.98;letter-spacing:-.02em}
+.title-slide h1 .sun-w{color:var(--amber)}
+.title-slide h1 .moon-w{color:var(--moon)}
+.abl{margin-top:clamp(14px,2.6vh,30px);font-size:clamp(14px,2vh,20px);color:var(--cream-dim)}
+.abl b{color:var(--cream);font-weight:700}
+.abl .paren{color:var(--amber)}
+.title-orbit{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  border:1px solid rgba(244,238,224,.08);border-radius:50%;pointer-events:none}
+.title-orbit.t1{width:min(720px,110vmin);height:min(720px,110vmin)}
+.title-orbit.t2{width:min(940px,140vmin);height:min(940px,140vmin);border-color:rgba(244,238,224,.05)}
+.title-orbit .arm{position:absolute;inset:0;animation:spin 24s linear infinite}
+.title-orbit.t2 .arm{animation-duration:40s;animation-direction:reverse}
+.title-orbit .orb{position:absolute;top:-7px;left:50%;margin-left:-7px;width:14px;height:14px;
+  border-radius:50%;background:var(--amber);box-shadow:0 0 22px rgba(255,179,71,.9)}
+.title-orbit.t2 .orb{background:var(--moon);width:10px;height:10px;margin-left:-5px;top:-5px;
+  box-shadow:0 0 18px rgba(232,228,216,.8)}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.meta-line{margin-top:clamp(20px,4vh,44px);display:flex;gap:22px;align-items:center;
+  font-size:clamp(9px,1.3vh,12px);letter-spacing:.3em;text-transform:uppercase;color:var(--cream-dim)}
+.meta-line span{display:flex;align-items:center;gap:10px}
+.meta-line i{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block}
+.quiz-head{display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:1px solid var(--line);padding-bottom:clamp(8px,1.4vh,16px);margin-bottom:clamp(10px,2vh,24px)}
+.quiz-head h2{font-family:'Bricolage Grotesque';font-weight:800;font-size:clamp(22px,3.2vh + .8vw,42px)}
+.quiz-head h2 em{font-style:normal;color:var(--amber)}
+.qmeta{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.quiz-head .qn{font-family:'Bricolage Grotesque';color:var(--amber);
+  font-size:clamp(10px,1.4vh,14px);letter-spacing:.25em;text-transform:uppercase}
+.scorechip{display:inline-flex;align-items:center;gap:7px;font-family:'Bricolage Grotesque';font-weight:700;
+  font-size:11px;letter-spacing:.14em;color:var(--amber);border:1px solid rgba(255,179,71,.45);
+  border-radius:999px;padding:4px 12px;background:rgba(255,179,71,.07)}
+.scorechip b{font-size:14px;color:var(--cream)}
+.qwrap{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,36px);flex:1;min-height:0;align-content:center}
+.q{border:1px solid var(--line);border-radius:clamp(14px,2vh,22px);
+  padding:clamp(12px,2.4vh,28px) clamp(14px,2.4vw,30px);background:rgba(13,18,32,.55);
+  display:flex;flex-direction:column;min-height:0}
+.q.flash{animation:qflash .55s ease}
+@keyframes qflash{0%,100%{box-shadow:0 0 0 0 rgba(255,179,71,0)}
+  40%{box-shadow:0 0 0 3px rgba(255,179,71,.6)}}
+.q .qnum{font-family:'Bricolage Grotesque';font-weight:700;color:var(--teal);
+  font-size:clamp(9px,1.3vh,13px);letter-spacing:.2em;margin-bottom:clamp(5px,1vh,10px)}
+.q p{font-size:clamp(14px,1.8vh + .5vw,19px);line-height:1.4;margin-bottom:clamp(8px,1.8vh,18px)}
+.opts{display:grid;gap:clamp(6px,1.1vh,10px)}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;
+  background:transparent;border:1px solid var(--line);border-radius:11px;
+  color:var(--cream);padding:clamp(7px,1.2vh,11px) clamp(10px,1.5vw,16px);
+  font-family:'Space Grotesk';font-size:clamp(12px,1.4vh + .4vw,15px);transition:all .22s ease}
+.opt .key{font-family:'Bricolage Grotesque';font-weight:700;font-size:.8em;color:var(--amber);
+  border:1px solid rgba(255,179,71,.45);border-radius:7px;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.opt:hover:not(:disabled){border-color:rgba(255,179,71,.6);transform:translateX(4px)}
+.opt.correct{border-color:var(--right);background:rgba(74,222,128,.1)}
+.opt.correct .key{background:var(--right);color:var(--ink);border-color:var(--right)}
+.opt.wrong{border-color:var(--wrong);background:rgba(255,92,108,.08)}
+.opt.wrong .key{background:var(--wrong);color:var(--ink);border-color:var(--wrong)}
+.opt:disabled{cursor:default}
+.opt.reveal{animation:popIn .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes popIn{0%{transform:scale(.95)}55%{transform:scale(1.04)}100%{transform:scale(1)}}
+.fdbk{margin-top:clamp(6px,1.2vh,14px);font-size:clamp(11px,1.4vh,14px);
+  color:var(--cream-dim);min-height:1.3em;opacity:0;transition:opacity .3s;line-height:1.4}
+.fdbk.show{opacity:1}
+.fdbk.good{color:var(--right)}.fdbk.bad{color:var(--wrong)}
+.thanks{justify-content:center;align-items:center;text-align:center}
+.thanks h1{font-family:'Bricolage Grotesque';font-weight:800;
+  font-size:clamp(44px,min(10vw,15vh),150px);letter-spacing:-.02em;line-height:1}
+.thanks h1 .y{color:var(--amber)}
+.thanks p{margin-top:clamp(10px,2vh,20px);color:var(--cream-dim);
+  font-size:clamp(11px,1.6vh,17px);letter-spacing:.14em;text-transform:uppercase}
+.finalscore{margin-top:clamp(12px,2.4vh,26px);display:flex;flex-direction:column;align-items:center;gap:10px}
+.finalscore .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:clamp(22px,4.2vh,42px)}
+.finalscore .big .scv{color:var(--amber)}
+.finalscore .tier{color:var(--teal);letter-spacing:.28em;text-transform:uppercase;
+  font-size:clamp(10px,1.6vh,14px);font-family:'Bricolage Grotesque';font-weight:700}
+.retry{margin-top:clamp(14px,2.8vh,28px);background:transparent;cursor:pointer;
+  border:1px solid rgba(255,179,71,.55);color:var(--amber);border-radius:999px;
+  font-family:'Bricolage Grotesque';font-weight:700;font-size:13px;letter-spacing:.12em;
+  padding:12px 26px;transition:all .22s ease}
+.retry:hover{background:rgba(255,179,71,.14);transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,122,47,.25)}
+.sunbig{position:absolute;left:50%;bottom:-46vw;transform:translateX(-50%);width:88vw;height:88vw;border-radius:50%;
+  background:radial-gradient(circle at 50% 30%, #FF8A3D 0%, #FFB347 34%, rgba(255,122,47,.14) 55%, transparent 70%);
+  opacity:.9;pointer-events:none}
+.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--amber2),var(--amber));
+  z-index:60;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.pagenum{position:fixed;bottom:16px;right:22px;z-index:60;pointer-events:none;
+  font-family:'Bricolage Grotesque';font-size:13px;color:var(--cream-dim);letter-spacing:.1em}
+.pagenum b{color:var(--cream)}
+.brandmark{position:fixed;bottom:16px;left:22px;z-index:60;pointer-events:none;
+  font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:rgba(244,238,224,.35)}
+.brandmark b{color:var(--amber)}
+.hint{position:fixed;bottom:40px;left:22px;z-index:60;pointer-events:none;
+  font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,238,224,.3)}
+.rail{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:61;display:flex;gap:7px}
+.dot-nav{width:8px;height:8px;border-radius:50%;border:1px solid rgba(244,238,224,.35);
+  background:transparent;cursor:pointer;padding:0;transition:all .25s ease}
+.dot-nav:hover{border-color:var(--amber);transform:scale(1.35)}
+.dot-nav.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 10px rgba(255,179,71,.8)}
+@media (max-width:900px){
+  .slide{overflow-y:auto;scrollbar-width:thin}
+  .body-grid{grid-template-columns:1fr}
+  .fig .frame{flex:0 0 auto;min-height:240px}
+  .qwrap{grid-template-columns:1fr}
+  .hint{display:none}
+  .rail{gap:5px}.dot-nav{width:6px;height:6px}
+  .quiz-head{flex-wrap:wrap;gap:8px}
+  .qmeta{align-items:flex-start}
+}
+@media (max-height:560px){.funfact{display:none}}
+</style>
+</head>
+<body>
+
+<div class="sky"><div class="stars"></div><div class="glow"></div><div class="glow2"></div></div>
+<div class="grain"></div>
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 : TITLE -->
+<section class="slide title-slide active">
+  <div class="title-orbit t1"><div class="arm"><div class="orb"></div></div></div>
+  <div class="title-orbit t2"><div class="arm"><div class="orb"></div></div></div>
+  <div class="over rv d1">NCERT Science · Grade 7 · Chapter 12</div>
+  <h1 class="rv d2">Earth, <span class="moon-w">Moon</span> &amp;<br>the <span class="sun-w">Sun</span></h1>
+  <div class="abl rv d3"><span class="paren">(</span> <b>ABL</b> — Activity Based Lesson <span class="paren">)</span></div>
+  <div class="meta-line rv d4">
+    <span><i></i> Rotate</span><span><i></i> Revolve</span><span><i></i> Shine</span>
+  </div>
+</section>
+
+<!-- SLIDE 2 : THE SUN -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">02</span><span class="bar"></span>Cosmic Neighbourhood</div>
+  <h2 class="slide-title rv d2">The Sun — our <em>nearest star</em></h2>
+  <div class="body-grid">
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>A giant ball of glowing <b>hot gases</b> — mainly hydrogen and helium — that gives out its own light and heat.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>It is about <b>150 million km</b> away from Earth — the light you see left it about <b>8 minutes</b> ago.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>Over <b>13 lakh Earths</b> could fit inside the Sun. It is the <b>centre</b> of our solar system.</span></li>
+        <li class="rv d6"><span class="dot"></span><span>All life on Earth depends on its <b>energy</b> — for warmth, light, food and weather.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> The Sun makes up about 99.8% of all the mass in our solar system — Earth and everything else is just the leftover 0.2%!</div>
+    </div>
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <defs><radialGradient id="sunG" cx="50%" cy="45%">
+            <stop offset="0%" stop-color="#FFE29A"/><stop offset="55%" stop-color="#FFB347"/><stop offset="100%" stop-color="#FF7A2F"/>
+          </radialGradient></defs>
+          <g stroke="#FFB347" stroke-width="2" stroke-linecap="round" opacity=".8">
+            <line x1="150" y1="18" x2="150" y2="40"/><line x1="150" y1="260" x2="150" y2="282"/>
+            <line x1="18" y1="150" x2="40" y2="150"/><line x1="260" y1="150" x2="282" y2="150"/>
+            <line x1="50" y1="50" x2="66" y2="66"/><line x1="234" y1="234" x2="250" y2="250"/>
+            <line x1="250" y1="50" x2="234" y2="66"/><line x1="66" y1="234" x2="50" y2="250"/>
+          </g>
+          <circle cx="150" cy="150" r="78" fill="url(#sunG)"/>
+          <circle cx="150" cy="150" r="78" fill="none" stroke="#FF7A2F" stroke-width="3" opacity=".5"/>
+          <circle cx="128" cy="132" r="10" fill="#FF7A2F" opacity=".35"/>
+          <circle cx="172" cy="164" r="13" fill="#FF7A2F" opacity=".3"/>
+          <circle cx="158" cy="120" r="6" fill="#FF7A2F" opacity=".3"/>
+        </svg>
+      </div>
+      <figcaption>Fig — Our star at the centre</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SLIDE 3 : ROTATION -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">03</span><span class="bar"></span>Motion of the Earth</div>
+  <h2 class="slide-title rv d2">Rotation — <em>day and night</em></h2>
+  <div class="body-grid">
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <g stroke="#FFB347" stroke-width="2" stroke-linecap="round" opacity=".7">
+            <line x1="10" y1="105" x2="52" y2="112"/><line x1="10" y1="135" x2="52" y2="140"/>
+            <line x1="10" y1="165" x2="52" y2="168"/><line x1="10" y1="195" x2="52" y2="196"/>
+          </g>
+          <circle cx="8" cy="150" r="6" fill="#FFB347"/>
+          <text x="16" y="230" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".7">SUNLIGHT</text>
+          <circle cx="175" cy="150" r="72" fill="#1E5C8A"/>
+          <path d="M103 150 A72 72 0 0 1 247 150 Z" fill="#0A0F1C"/>
+          <circle cx="175" cy="150" r="72" fill="none" stroke="#5FD4C4" stroke-width="2"/>
+          <circle cx="205" cy="120" r="6" fill="#8AD6FF" opacity=".6"/>
+          <circle cx="192" cy="178" r="5" fill="#8AD6FF" opacity=".45"/>
+          <line x1="120" y1="55" x2="230" y2="245" stroke="#F4EEE0" stroke-width="2" stroke-dasharray="6 5"/>
+          <circle cx="120" cy="55" r="3" fill="#F4EEE0"/><circle cx="230" cy="245" r="3" fill="#F4EEE0"/>
+          <text x="100" y="45" fill="#F4EEE0" font-size="10" font-family="Space Grotesk">N</text>
+          <text x="236" y="262" fill="#F4EEE0" font-size="10" font-family="Space Grotesk">S</text>
+          <path d="M 258 110 A 92 92 0 0 0 245 92" fill="none" stroke="#FFB347" stroke-width="3" stroke-linecap="round"/>
+          <path d="M245 92 l-2 12 l12 -2 z" fill="#FFB347"/>
+          <text x="150" y="290" text-anchor="middle" fill="#FFB347" font-size="11" font-family="Space Grotesk" letter-spacing="2">24 HOURS · WEST → EAST</text>
+        </svg>
+      </div>
+      <figcaption>Fig — One spin, one day</figcaption>
+    </figure>
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>Earth spins on its <b>axis</b> from <b>west to east</b> — this is called <b>rotation</b>.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>One rotation takes about <b>24 hours</b>. The side facing the Sun has <b>day</b>; the other side has <b>night</b>.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>This is why the Sun appears to <b>rise in the east</b> and <b>set in the west</b> — it is really <b>we who are moving</b>.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> At the equator you are spinning around at about 1,670 km/h right now — you can't feel it because everything around you moves along with you!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4 : REVOLUTION -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">04</span><span class="bar"></span>Motion of the Earth</div>
+  <h2 class="slide-title rv d2">Revolution — the <em>changing night sky</em></h2>
+  <div class="body-grid">
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>Earth also moves around the Sun in a fixed path called its <b>orbit</b>. This is <b>revolution</b>.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>One revolution takes <b>365¼ days</b> — one <b>year</b>. Every 4 years, the extra ¼ days add up to make a <b>leap year</b>.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>As we journey around the Sun, we face <b>different stars at night</b> in different seasons — so the night sky slowly changes through the year.</span></li>
+        <li class="rv d6"><span class="dot"></span><span>Constellations like <b>Orion</b> and <b>Ursa Major</b> appear at different times of the year.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> Earth races around the Sun at about 107,000 km/h — fast enough to circle our whole planet in just one minute!</div>
+    </div>
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <circle cx="150" cy="150" r="10" fill="#FFB347"/>
+          <circle cx="150" cy="150" r="18" fill="none" stroke="#FFB347" stroke-width="1.5" opacity=".4"/>
+          <ellipse cx="150" cy="150" rx="112" ry="80" fill="none" stroke="#5FD4C4" stroke-width="2" stroke-dasharray="7 6" opacity=".8"/>
+          <g font-family="Space Grotesk" font-size="10" fill="#F4EEE0">
+            <g><circle cx="150" cy="70" r="14" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="1.5"/><text x="170" y="66">Mar</text></g>
+            <g><circle cx="262" cy="150" r="14" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="1.5"/><text x="238" y="176">Jun</text></g>
+            <g><circle cx="150" cy="230" r="14" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="1.5"/><text x="170" y="244">Sep</text></g>
+            <g><circle cx="38" cy="150" r="14" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="1.5"/><text x="22" y="132">Dec</text></g>
+          </g>
+          <path d="M 160 62 A 112 80 0 0 1 258 140" fill="none" stroke="#FFB347" stroke-width="3" stroke-linecap="round"/>
+          <path d="M258 140 l-12 -3 l6 11 z" fill="#FFB347"/>
+          <g fill="#F4EEE0">
+            <circle cx="40" cy="40" r="1.6"/><circle cx="262" cy="52" r="1.6"/><circle cx="270" cy="240" r="1.6"/>
+            <circle cx="34" cy="252" r="1.6"/><circle cx="140" cy="30" r="1.3"/>
+          </g>
+          <text x="150" y="290" text-anchor="middle" fill="#F4EEE0" font-size="11" font-family="Space Grotesk" letter-spacing="2" opacity=".75">365¼ DAYS · ONE FULL LAP</text>
+        </svg>
+      </div>
+      <figcaption>Fig — Fig 12.8 · Earth's yearly journey</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SLIDE 5 : SEASONS -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">05</span><span class="bar"></span>Seasons on the Earth</div>
+  <h2 class="slide-title rv d2">Why do <em>seasons</em> happen?</h2>
+  <div class="body-grid">
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <g>
+            <circle cx="85" cy="110" r="52" fill="#1E5C8A"/>
+            <path d="M33 110 A52 52 0 0 1 137 110 Z" fill="#FFD98A" opacity=".9"/>
+            <circle cx="85" cy="110" r="52" fill="none" stroke="#5FD4C4" stroke-width="2"/>
+            <line x1="55" y1="58" x2="115" y2="162" stroke="#F4EEE0" stroke-width="2" stroke-dasharray="5 4"/>
+            <circle cx="55" cy="58" r="3" fill="#F4EEE0"/>
+            <text x="85" y="186" text-anchor="middle" fill="#FFB347" font-size="12" font-family="Space Grotesk" font-weight="bold">JUNE</text>
+            <text x="85" y="202" text-anchor="middle" fill="#F4EEE0" font-size="9" font-family="Space Grotesk" opacity=".7">North leans in · Summer</text>
+          </g>
+          <g>
+            <circle cx="215" cy="110" r="52" fill="#1E5C8A"/>
+            <path d="M163 110 A52 52 0 0 1 267 110 Z" fill="#FFD98A" opacity=".35"/>
+            <circle cx="215" cy="110" r="52" fill="none" stroke="#5FD4C4" stroke-width="2"/>
+            <line x1="245" y1="58" x2="185" y2="162" stroke="#F4EEE0" stroke-width="2" stroke-dasharray="5 4"/>
+            <circle cx="245" cy="58" r="3" fill="#F4EEE0"/>
+            <text x="215" y="186" text-anchor="middle" fill="#5FD4C4" font-size="12" font-family="Space Grotesk" font-weight="bold">DECEMBER</text>
+            <text x="215" y="202" text-anchor="middle" fill="#F4EEE0" font-size="9" font-family="Space Grotesk" opacity=".7">North leans away · Winter</text>
+          </g>
+          <text x="150" y="240" text-anchor="middle" fill="#FF7A2F" font-size="13" font-family="Bricolage Grotesque" font-weight="700">TILT = 23.5°</text>
+          <text x="150" y="260" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".7">Same tilt, all year long</text>
+        </svg>
+      </div>
+      <figcaption>Fig — The tilted axis at work</figcaption>
+    </figure>
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>Earth's axis is <b>tilted at 23.5°</b> — and it always points the same way as we orbit.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>In <b>June</b>, the Northern Hemisphere leans <b>towards</b> the Sun — sunlight is <b>more concentrated</b> and days are <b>longer</b>. It's summer!</span></li>
+        <li class="rv d5"><span class="dot"></span><span>In <b>December</b>, it leans <b>away</b> — rays spread out, days are shorter. Winter! Seasons are <b>opposite</b> in the Southern Hemisphere.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> Seasons have nothing to do with our distance from the Sun — Earth is actually closest to the Sun in January, during the Northern Hemisphere's winter!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6 : MOON PHASES -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">06</span><span class="bar"></span>Our Companion</div>
+  <h2 class="slide-title rv d2">The Moon and its <em>phases</em></h2>
+  <div class="body-grid">
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>The Moon is Earth's <b>natural satellite</b>. It has <b>no light of its own</b> — it only reflects sunlight.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>It revolves around Earth in about <b>27 days</b>, and rotates at the same rate — so we always see the <b>same face</b>.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>As the Moon circles us, we see different <b>lit portions</b> — New Moon → Crescent → First Quarter → Full Moon → and back.</span></li>
+        <li class="rv d6"><span class="dot"></span><span>The full cycle of phases takes about <b>29½ days</b> — roughly one month, or a <b>lunar month</b>.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> The Moon is slowly drifting away from Earth — about 3.8 cm every year, roughly the speed your fingernails grow!</div>
+    </div>
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <text x="150" y="40" text-anchor="middle" fill="#FFB347" font-size="11" font-family="Space Grotesk" letter-spacing="3">LUNAR MONTH · 29½ DAYS</text>
+          <circle cx="45" cy="110" r="20" fill="#232A3A" stroke="#E8E4D8" stroke-width="1" stroke-dasharray="3 3" opacity=".9"/>
+          <path d="M122 90 a20 20 0 0 1 0 40 a30 30 0 0 0 0 -40 z" fill="#E8E4D8"/>
+          <path d="M187 90 a20 20 0 0 1 0 40 z" fill="#E8E4D8"/>
+          <circle cx="187" cy="110" r="20" fill="none" stroke="#E8E4D8" stroke-width="1" opacity=".35"/>
+          <circle cx="252" cy="110" r="20" fill="#E8E4D8"/>
+          <g font-family="Space Grotesk" font-size="9" fill="#F4EEE0" opacity=".75" text-anchor="middle">
+            <text x="45" y="152">New</text><text x="122" y="152">Crescent</text>
+            <text x="187" y="152">Quarter</text><text x="252" y="152">Full</text>
+          </g>
+          <circle cx="45" cy="205" r="20" fill="#E8E4D8"/>
+          <path d="M45 185 a20 20 0 0 1 0 40 a30 30 0 0 0 0 -40 z" fill="#232A3A"/>
+          <path d="M122 185 a20 20 0 0 0 0 40 z" fill="#E8E4D8"/>
+          <circle cx="122" cy="205" r="20" fill="none" stroke="#E8E4D8" stroke-width="1" opacity=".35"/>
+          <path d="M187 185 a20 20 0 0 0 0 40 a30 30 0 0 1 0 -40 z" fill="#E8E4D8"/>
+          <circle cx="252" cy="205" r="20" fill="#232A3A" stroke="#E8E4D8" stroke-width="1" stroke-dasharray="3 3" opacity=".9"/>
+          <g font-family="Space Grotesk" font-size="9" fill="#F4EEE0" opacity=".75" text-anchor="middle">
+            <text x="45" y="247">Gibbous</text><text x="122" y="247">Last Qtr</text><text x="187" y="247">Waning</text><text x="252" y="247">New</text>
+          </g>
+          <path d="M 20 178 q 130 22 260 0" fill="none" stroke="#5FD4C4" stroke-width="1" opacity=".4" stroke-dasharray="4 5"/>
+        </svg>
+      </div>
+      <figcaption>Fig — The phase cycle</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SLIDE 7 : SOLAR ECLIPSE -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">07</span><span class="bar"></span>Eclipses</div>
+  <h2 class="slide-title rv d2">The <em>solar eclipse</em></h2>
+  <div class="body-grid">
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <circle cx="40" cy="150" r="34" fill="#FFB347"/>
+          <circle cx="40" cy="150" r="42" fill="none" stroke="#FFB347" stroke-width="1.5" opacity=".35"/>
+          <g stroke="#FFB347" stroke-width="1.5" opacity=".6">
+            <line x1="70" y1="128" x2="300" y2="66"/><line x1="72" y1="150" x2="300" y2="150"/>
+            <line x1="70" y1="172" x2="300" y2="234"/>
+          </g>
+          <circle cx="175" cy="150" r="20" fill="#232A3A" stroke="#E8E4D8" stroke-width="1.5"/>
+          <path d="M195 136 L300 118 L300 182 L195 164 Z" fill="#05070D" stroke="#5FD4C4" stroke-width="1" stroke-dasharray="4 4"/>
+          <circle cx="255" cy="150" r="26" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="2"/>
+          <circle cx="255" cy="150" r="26" fill="#05070D" opacity=".85"/>
+          <text x="255" y="205" text-anchor="middle" fill="#5FD4C4" font-size="11" font-family="Space Grotesk">UMBRA</text>
+          <g font-family="Space Grotesk" font-size="10" fill="#F4EEE0">
+            <text x="40" y="205" text-anchor="middle">SUN</text>
+            <text x="175" y="205" text-anchor="middle">MOON</text>
+            <text x="255" y="118" text-anchor="middle">EARTH</text>
+          </g>
+          <text x="150" y="262" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".75">SUN → MOON → EARTH · NEW MOON DAY</text>
+        </svg>
+      </div>
+      <figcaption>Fig — Moon blocks the Sun</figcaption>
+    </figure>
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>An eclipse happens when the <b>Earth, Moon and Sun line up</b> in a straight line.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>In a <b>solar eclipse</b>, the Moon comes <b>between</b> the Sun and Earth, casting its shadow on us. Day briefly turns <b>dark</b>.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>It can only happen on a <b>new moon day</b>, and is visible only from parts of Earth inside the Moon's shadow.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> By amazing coincidence, the Sun is about 400 times bigger than the Moon but also 400 times farther away — so they look the same size in our sky, making perfect eclipses possible!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8 : LUNAR ECLIPSE -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">08</span><span class="bar"></span>Eclipses</div>
+  <h2 class="slide-title rv d2">The <em>lunar eclipse</em></h2>
+  <div class="body-grid">
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>In a <b>lunar eclipse</b>, the <b>Earth</b> comes between the Sun and the Moon — the Moon passes into <b>Earth's shadow</b>.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>The full Moon slowly darkens, and can even look <b>dull reddish-brown</b> ("blood moon"), because some sunlight bends through Earth's atmosphere.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>It happens only on a <b>full moon night</b> and is safe to watch with the <b>naked eye</b>.</span></li>
+        <li class="rv d6"><span class="dot"></span><span>A lunar eclipse is visible from the <b>entire night side</b> of Earth at once.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> During a total lunar eclipse, the Moon can glow a coppery red — often called a "Blood Moon" — as sunlight bends through Earth's atmosphere onto it.</div>
+    </div>
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <circle cx="36" cy="150" r="26" fill="#FFB347"/>
+          <g stroke="#FFB347" stroke-width="1.5" opacity=".6">
+            <line x1="62" y1="134" x2="300" y2="134"/><line x1="62" y1="150" x2="300" y2="150"/><line x1="62" y1="166" x2="300" y2="166"/>
+          </g>
+          <circle cx="130" cy="150" r="34" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="2"/>
+          <circle cx="120" cy="140" r="6" fill="#8AD6FF" opacity=".5"/>
+          <path d="M164 134 L300 128 L300 172 L164 166 Z" fill="#05070D" stroke="#5FD4C4" stroke-width="1" stroke-dasharray="4 4"/>
+          <circle cx="248" cy="150" r="18" fill="#8A3B2E"/>
+          <circle cx="248" cy="150" r="18" fill="none" stroke="#E8E4D8" stroke-width="1.2" opacity=".5"/>
+          <text x="248" y="196" text-anchor="middle" fill="#FF9A7A" font-size="10" font-family="Space Grotesk">reddish glow</text>
+          <g font-family="Space Grotesk" font-size="10" fill="#F4EEE0">
+            <text x="36" y="196" text-anchor="middle">SUN</text>
+            <text x="130" y="200" text-anchor="middle">EARTH</text>
+            <text x="248" y="126" text-anchor="middle">MOON</text>
+          </g>
+          <text x="150" y="256" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".75">SUN → EARTH → MOON · FULL MOON NIGHT</text>
+        </svg>
+      </div>
+      <figcaption>Fig — Earth's shadow on the Moon</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SLIDE 9 : WHY NOT EVERY MONTH -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">09</span><span class="bar"></span>Think Deeper</div>
+  <h2 class="slide-title rv d2">Why no eclipse <em>every month</em>?</h2>
+  <div class="body-grid">
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <circle cx="150" cy="150" r="34" fill="#1E5C8A" stroke="#5FD4C4" stroke-width="2"/>
+          <ellipse cx="150" cy="150" rx="120" ry="34" fill="none" stroke="#F4EEE0" stroke-width="1" opacity=".3" stroke-dasharray="3 4"/>
+          <ellipse cx="150" cy="150" rx="120" ry="34" fill="none" stroke="#E8E4D8" stroke-width="2" transform="rotate(-16 150 150)"/>
+          <circle cx="268" cy="150" r="12" fill="#E8E4D8" transform="rotate(-16 150 150)"/>
+          <circle cx="38" cy="150" r="12" fill="#E8E4D8" transform="rotate(-16 150 150)"/>
+          <circle cx="70" cy="167" r="4" fill="#FFB347"/>
+          <circle cx="230" cy="133" r="4" fill="#FFB347"/>
+          <text x="96" y="192" fill="#FFB347" font-size="10" font-family="Space Grotesk">node</text>
+          <text x="222" y="118" fill="#FFB347" font-size="10" font-family="Space Grotesk">node</text>
+          <text x="150" y="252" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".75">The Moon's orbit is TILTED ~5°</text>
+          <text x="150" y="268" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".75">— most new/full moons miss the line-up</text>
+        </svg>
+      </div>
+      <figcaption>Fig — The tilted lunar orbit</figcaption>
+    </figure>
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>If the Moon's orbit lay <b>flat</b> in the same plane as Earth's orbit, we would see an eclipse <b>every month</b>.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>But the Moon's path is tilted about <b>5°</b> — so most months the shadows <b>miss</b> each other.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>Eclipses occur only when the line-up happens near the two crossing points, called <b>nodes</b> — roughly <b>4–7 times a year</b> worldwide.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> Ancient Babylonians predicted eclipses thousands of years ago using an 18-year, 11-day pattern called the "Saros cycle"!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10 : NIGHT SKY -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">10</span><span class="bar"></span>Fascinating Facts</div>
+  <h2 class="slide-title rv d2">Reading the <em>night sky</em></h2>
+  <div class="body-grid">
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span>Groups of stars forming patterns are called <b>constellations</b> — like <b>Saptarshi (Ursa Major)</b>, the Great Bear with seven bright stars.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>The <b>Pole Star (Dhruva Tara)</b> stays fixed in the north and has guided travellers for thousands of years.</span></li>
+        <li class="rv d5"><span class="dot"></span><span><b>Fascinating fact:</b> In India, the <b>Bhil and Pawara tribes</b> of Maharashtra use the position of stars to mark the arrival of the <b>monsoon rains</b>.</span></li>
+        <li class="rv d6"><span class="dot"></span><span>Stars are huge, far-away <b>suns</b> — they only seem tiny and twinkling because of their great distance.</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> Light from the nearest star after our Sun — Proxima Centauri — takes over 4 years to reach Earth. We see it as 4 years ago!</div>
+    </div>
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <g fill="#F4EEE0">
+            <circle cx="60" cy="70" r="2"/><circle cx="100" cy="110" r="2"/><circle cx="140" cy="70" r="2"/>
+            <circle cx="120" cy="160" r="2"/><circle cx="160" cy="120" r="2"/><circle cx="80" cy="130" r="2"/>
+            <circle cx="50" cy="230" r="1.5"/><circle cx="250" cy="60" r="1.5"/><circle cx="260" cy="220" r="1.5"/>
+          </g>
+          <polyline points="55,200 90,185 125,190 158,175 165,140 130,128"
+            fill="none" stroke="#5FD4C4" stroke-width="1.5" opacity=".55"/>
+          <g fill="#FFB347">
+            <circle cx="55" cy="200" r="5"/><circle cx="90" cy="185" r="5"/><circle cx="125" cy="190" r="5"/>
+            <circle cx="158" cy="175" r="5"/><circle cx="165" cy="140" r="5"/><circle cx="130" cy="128" r="5"/>
+          </g>
+          <g fill="#E8E4D8"><circle cx="112" cy="100" r="5"/><circle cx="142" cy="96" r="5"/></g>
+          <line x1="160" y1="172" x2="238" y2="82" stroke="#FFB347" stroke-width="1" stroke-dasharray="4 4" opacity=".7"/>
+          <circle cx="245" cy="72" r="6" fill="#F4EEE0"/>
+          <circle cx="245" cy="72" r="12" fill="none" stroke="#F4EEE0" stroke-width="1" opacity=".4"/>
+          <text x="245" y="52" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk">POLE STAR</text>
+          <text x="118" y="228" text-anchor="middle" fill="#5FD4C4" font-size="10" font-family="Space Grotesk" letter-spacing="2">SAPTARSHI · THE BIG BEAR</text>
+        </svg>
+      </div>
+      <figcaption>Fig — Stars as a sky-map</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SLIDE 11 : SAFE VIEWING -->
+<section class="slide">
+  <div class="kicker rv d1"><span class="no">11</span><span class="bar"></span>Be a Safe Scientist</div>
+  <h2 class="slide-title rv d2">Watching an eclipse <em>safely</em></h2>
+  <div class="body-grid">
+    <figure class="fig rv d4">
+      <div class="frame">
+        <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+          <circle cx="48" cy="150" r="26" fill="#FFB347"/>
+          <g stroke="#FFB347" stroke-width="2" opacity=".6">
+            <line x1="48" y1="112" x2="48" y2="100"/><line x1="48" y1="188" x2="48" y2="200"/>
+            <line x1="10" y1="150" x2="22" y2="150"/><line x1="74" y1="150" x2="86" y2="150"/>
+          </g>
+          <g stroke="#FFD98A" stroke-width="2">
+            <line x1="72" y1="138" x2="140" y2="118"/><line x1="72" y1="150" x2="140" y2="150"/><line x1="72" y1="162" x2="140" y2="182"/>
+          </g>
+          <rect x="140" y="105" width="105" height="90" rx="8" fill="#161D2E" stroke="#E8E4D8" stroke-width="2"/>
+          <circle cx="140" cy="150" r="4" fill="#FFB347"/>
+          <circle cx="236" cy="150" r="13" fill="none" stroke="#FFB347" stroke-width="2"/>
+          <text x="236" y="155" text-anchor="middle" fill="#FFB347" font-size="12" font-family="Space Grotesk">☀</text>
+          <text x="192" y="215" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".75">PINHOLE CAMERA BOX</text>
+          <text x="150" y="252" text-anchor="middle" fill="#FF5C6C" font-size="11" font-family="Space Grotesk" letter-spacing="1">✕ NEVER look at the Sun directly</text>
+          <text x="150" y="270" text-anchor="middle" fill="#F4EEE0" font-size="10" font-family="Space Grotesk" opacity=".7">✓ Use a pinhole projection or certified filters</text>
+        </svg>
+      </div>
+      <figcaption>Fig — Pinhole projection method</figcaption>
+    </figure>
+    <div>
+      <ul class="points">
+        <li class="rv d3"><span class="dot"></span><span><b>Never</b> look at the Sun directly — not with naked eyes, sunglasses, X-ray films or cameras. It can permanently damage your eyes.</span></li>
+        <li class="rv d4"><span class="dot"></span><span>Safe methods: <b>pinhole projection</b>, specially made <b>eclipse glasses</b> (certified filters), or welding glass of shade 14.</span></li>
+        <li class="rv d5"><span class="dot"></span><span>A <b>lunar eclipse</b> is completely safe to watch directly — no filters needed!</span></li>
+      </ul>
+      <div class="funfact rv d6"><span class="tag">FUN FACT</span> Pinhole viewers were used by ancient astronomers over 2,000 years ago — a simple idea older than the telescope itself!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12 : QUIZ 1 -->
+<section class="slide">
+  <div class="quiz-head rv d1">
+    <h2>Quiz <em>Time</em></h2>
+    <div class="qmeta">
+      <span class="qn">Round 1 · Round &amp; Round</span>
+      <span class="scorechip">SCORE <b id="sc1">0</b> / 2</span>
+    </div>
+  </div>
+  <div class="qwrap">
+    <div class="q rv d2" data-q>
+      <div class="qnum">QUESTION 01</div>
+      <p>How long does the Earth take to complete one rotation on its axis?</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> One year</button>
+        <button class="opt" data-c="1"><span class="key">B</span> About 24 hours</button>
+        <button class="opt" data-c="0"><span class="key">C</span> One month</button>
+        <button class="opt" data-c="0"><span class="key">D</span> 365¼ days</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+    <div class="q rv d3" data-q>
+      <div class="qnum">QUESTION 02</div>
+      <p>The Sun appears to rise in the east and set in the west because:</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> The Sun revolves around the Earth</button>
+        <button class="opt" data-c="0"><span class="key">B</span> The Sun rotates around the Moon</button>
+        <button class="opt" data-c="1"><span class="key">C</span> The Earth rotates from west to east</button>
+        <button class="opt" data-c="0"><span class="key">D</span> Clouds move the Sun across the sky</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 13 : QUIZ 2 -->
+<section class="slide">
+  <div class="quiz-head rv d1">
+    <h2>Quiz <em>Time</em></h2>
+    <div class="qmeta">
+      <span class="qn">Round 2 · Seasons &amp; Moon</span>
+      <span class="scorechip">SCORE <b id="sc2">0</b> / 2</span>
+    </div>
+  </div>
+  <div class="qwrap">
+    <div class="q rv d2" data-q>
+      <div class="qnum">QUESTION 03</div>
+      <p>Seasons on the Earth are mainly caused by:</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> Earth getting closer to the Sun</button>
+        <button class="opt" data-c="1"><span class="key">B</span> The 23.5° tilt of Earth's axis</button>
+        <button class="opt" data-c="0"><span class="key">C</span> The Moon's pull on the Earth</button>
+        <button class="opt" data-c="0"><span class="key">D</span> Changes in the Sun's size</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+    <div class="q rv d3" data-q>
+      <div class="qnum">QUESTION 04</div>
+      <p>The Moon shines brightly in our sky because:</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> It burns gases like the Sun</button>
+        <button class="opt" data-c="0"><span class="key">B</span> It makes its own light at night</button>
+        <button class="opt" data-c="1"><span class="key">C</span> It reflects light from the Sun</button>
+        <button class="opt" data-c="0"><span class="key">D</span> Earth shines light onto it</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 14 : QUIZ 3 -->
+<section class="slide">
+  <div class="quiz-head rv d1">
+    <h2>Quiz <em>Time</em></h2>
+    <div class="qmeta">
+      <span class="qn">Round 3 · Eclipses</span>
+      <span class="scorechip">SCORE <b id="sc3">0</b> / 2</span>
+    </div>
+  </div>
+  <div class="qwrap">
+    <div class="q rv d2" data-q>
+      <div class="qnum">QUESTION 05</div>
+      <p>During a solar eclipse, which body is between the other two?</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> The Earth</button>
+        <button class="opt" data-c="0"><span class="key">B</span> The Sun</button>
+        <button class="opt" data-c="1"><span class="key">C</span> The Moon</button>
+        <button class="opt" data-c="0"><span class="key">D</span> The Pole Star</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+    <div class="q rv d3" data-q>
+      <div class="qnum">QUESTION 06</div>
+      <p>Which statement about watching eclipses is TRUE?</p>
+      <div class="opts">
+        <button class="opt" data-c="0"><span class="key">A</span> Sunglasses are safe for a solar eclipse</button>
+        <button class="opt" data-c="1"><span class="key">B</span> A lunar eclipse is safe to watch directly</button>
+        <button class="opt" data-c="0"><span class="key">C</span> A solar eclipse is safe with naked eyes</button>
+        <button class="opt" data-c="0"><span class="key">D</span> No eclipse can ever be watched</button>
+      </div>
+      <div class="fdbk"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 15 : THANK YOU -->
+<section class="slide thanks">
+  <div class="sunbig"></div>
+  <h1 class="rv d1">Thank <span class="y">You</span></h1>
+  <p class="rv d2">Earth, Moon and the Sun · ABL · Keep looking up</p>
+  <div class="finalscore rv d3">
+    <div class="big">Quiz Score: <span class="scv" id="finalScore">0</span> / 6</div>
+    <div class="tier" id="scoreTier"></div>
+    <button class="retry" id="retryBtn">↻ RETRY QUIZ</button>
+  </div>
+</section>
+
+</div>
+
+<div class="hint">← → Arrow keys · Click to advance · F = fullscreen</div>
+<div class="brandmark"><b>ABL</b> · Earth, Moon &amp; the Sun</div>
+<div class="pagenum"><b id="cur">1</b> / <span id="tot">15</span></div>
+<div class="rail" id="rail"></div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let i=0;
+document.getElementById('tot').textContent=slides.length;
+
+/* ---- score tracking: qid -> 1/0 ; keys are data-q index ---- */
+const qEls=[...document.querySelectorAll('[data-q]')];
+const scores=new Array(qEls.length).fill(null);
+const scEls={11:document.getElementById('sc1'),12:document.getElementById('sc2'),13:document.getElementById('sc3')};
+const qSlideOf=[]; // q index -> slide index
+slides.forEach((s,si)=>{s.querySelectorAll('[data-q]').forEach(q=>{qSlideOf[qEls.indexOf(q)]=si;});});
+function updateChips(){
+  let total=0;
+  [11,12,13].forEach(sk=>{
+    let r=0,seen=0;
+    qEls.forEach((q,qi)=>{if(qSlideOf[qi]===sk){seen++;if(scores[qi])r+=scores[qi];}});
+    if(scEls[sk])scEls[sk].textContent=r;
+    total+=r;
+  });
+  const f=document.getElementById('finalScore');
+  if(f)f.textContent=total;
+  const answered=scores.filter(v=>v!==null).length;
+  const t=document.getElementById('scoreTier');
+  if(t){
+    if(answered<6){t.textContent=(6-answered)+' QUESTION'+(6-answered>1?'S':'')+' LEFT';}
+    else if(total===6){t.textContent='PERFECT — YOUNG ASTRONOMER!';}
+    else if(total>=4){t.textContent='GREAT JOB — STAR GAZER!';}
+    else if(total>=2){t.textContent='GOOD — KEEP LOOKING UP!';}
+    else{t.textContent='REVISIT THE SLIDES AND TRY AGAIN!';}
+  }
+}
+qEls.forEach((q,qi)=>{
+  const opts=[...q.querySelectorAll('.opt')];
+  const fb=q.querySelector('.fdbk');
+  opts.forEach(o=>o.addEventListener('click',()=>{
+    if(o.classList.contains('correct')||o.classList.contains('wrong'))return;
+    const correct=opts.find(x=>x.dataset.c==='1');
+    const letter=correct.querySelector('.key').textContent;
+    if(o.dataset.c==='1'){
+      o.classList.add('correct');
+      fb.textContent='✔ Correct! Well done.';fb.className='fdbk show good';
+      scores[qi]=1;
+    }else{
+      o.classList.add('wrong');
+      correct.classList.add('correct','reveal');
+      fb.innerHTML='✘ Not quite! The answer is <b>'+letter+'</b> — '+correct.textContent.trim().replace(/^[A-D]\s*/,'');
+      fb.className='fdbk show bad';
+      scores[qi]=0;
+    }
+    opts.forEach(x=>x.disabled=true);
+    q.classList.add('flash');
+    updateChips();
+  }));
+});
+document.getElementById('retryBtn').addEventListener('click',()=>{
+  scores.fill(null);
+  qEls.forEach(q=>{
+    q.classList.remove('flash');
+    q.querySelectorAll('.opt').forEach(o=>{o.classList.remove('correct','wrong','reveal');o.disabled=false;});
+    const fb=q.querySelector('.fdbk');fb.className='fdbk';fb.textContent='';
+  });
+  updateChips();
+  show(11); // jump to quiz round 1 (0-indexed)
+});
+
+/* ---- navigation ---- */
+function show(n){
+  slides[i].classList.remove('active');
+  i=(n+slides.length)%slides.length;
+  const s=slides[i];
+  s.querySelectorAll('.rv').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation='';});
+  s.classList.add('active');
+  document.getElementById('cur').textContent=i+1;
+  document.getElementById('progress').style.width=((i+1)/slides.length*100)+'%';
+  [...document.querySelectorAll('.dot-nav')].forEach((d,k)=>d.classList.toggle('on',k===i));
+}
+/* dot rail */
+const rail=document.getElementById('rail');
+slides.forEach((s,k)=>{
+  const b=document.createElement('button');
+  b.className='dot-nav'+(k===0?' on':'');
+  b.title='Slide '+(k+1);
+  b.addEventListener('click',()=>show(k));
+  rail.appendChild(b);
+});
+document.addEventListener('keydown',e=>{
+  const k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'||k==='n'||k==='N'){e.preventDefault();show(i+1);}
+  else if(k==='ArrowLeft'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){e.preventDefault();show(i-1);}
+  else if(k==='Home'){e.preventDefault();show(0);}
+  else if(k==='End'){e.preventDefault();show(slides.length-1);}
+  else if(k==='f'||k==='F'){e.preventDefault();
+    if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(()=>{});}
+    else{document.exitFullscreen();}
+  }
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('button')||e.target.closest('a'))return;
+  show(i+1);
+});
+let touchX=null;
+document.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(touchX===null)return;
+  const dx=e.changedTouches[0].clientX-touchX;
+  if(Math.abs(dx)>50)show(dx<0?i+1:i-1);
+  touchX=null;
+},{passive:true});
+show(0);
+updateChips();
+</script>
+</body>
+</html>
